@@ -1,6 +1,6 @@
 <?php
 // Konfigurasi koneksi PostgreSQL
-$conn = pg_connect("host=LocalHost port=5432 dbname=perpustakaan user=postgres password=root");
+$conn = pg_connect("host=LocalHost port=5432 dbname=db_perpustakaan user=postgres password=root");
 
 if (!$conn) {
     die("Koneksi PostgreSQL gagal");

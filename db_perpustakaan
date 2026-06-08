@@ -13,3 +13,17 @@ CREATE TABLE tbl_peminjaman (
     id_buku INT REFERENCES tbl_buku(id_buku),
     tanggal_pinjam DATE NOT NULL
 );
+
+INSERT INTO tbl_buku (judul, penulis, tahun_terbit) VALUES
+('Laskar Pelangi', 'Andrea Hirata', 2005),
+('Bumi', 'Tere Liye', 2014),
+('Negeri 5 Menara', 'Ahmad Fuadi', 2009),
+('Ayat-Ayat Cinta', 'Habiburrahman El Shirazy', 2004),
+('Dilan 1990', 'Pidi Baiq', 2014);
+
+INSERT INTO tbl_peminjaman (nama_peminjam, id_buku, tanggal_pinjam) VALUES
+('Amal', 1, '2026-06-01'),
+('Chandra', 2, '2026-06-02'),
+('Fathir', 3, '2026-06-03'),
+('Rahmat', 4, '2026-06-04'),
+('Adrian', 5, '2026-06-05');

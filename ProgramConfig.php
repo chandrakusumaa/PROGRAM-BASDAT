@@ -1,6 +1,6 @@
 <?php
 // Konfigurasi koneksi PostgreSQL
-$conn = pg_connect("host=LocalHost port=5432 dbname=db_perpustakaan user=postgres password=root");
+$conn = pg_connect("host=LocalHost port=5432 dbname=perpustakaan user=postgres password=root");
 
 if (!$conn) {
     die("Koneksi PostgreSQL gagal");
@@ -91,7 +91,6 @@ $result_pinjam = pg_query($conn, $sql_pinjam);
             <th>Judul</th>
             <th>Penulis</th>
             <th>Tahun Terbit</th>
-            <th>Aksi</th>
         </tr>
 
         <?php
@@ -107,11 +106,6 @@ $result_pinjam = pg_query($conn, $sql_pinjam);
                     <td>".$row['judul']."</td>
                     <td>".$row['penulis']."</td>
                     <td>".$row['tahun_terbit']."</td>
-                    <td>
-                        <a href='edit.php?id=".$row['id_buku']."'>Edit</a> |
-                        <a href='delete.php?id=".$row['id_buku']."'
-                        onclick=\"return confirm('Yakin ingin menghapus?')\">Hapus</a>
-                    </td>
                 </tr>";
             }
 
@@ -239,3 +233,42 @@ $result = pg_query($conn, $query);
  </form>
 </body>
 </html>
+
+<?php
+// Konfigurasi koneksi database
+$conn = pg_connect("host=LocalHost port=5432 dbname=perpustakaan user=postgres password=root");
+
+if (!$conn) {
+    die("Koneksi PostgreSQL gagal");
+}
+
+// Proses hapus data saat form disubmit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id_pinjam = intval($_POST["id_pinjam"]);
+    $sql = "DELETE FROM tbl_peminjaman WHERE id_pinjam = $id_pinjam";
+    $result = pg_query($conn, $sql);
+
+    if ($result) {
+        echo "<p style='color:green;'>Data dengan ID $id_pinjam berhasil dihapus!</p>";
+        echo "<meta http-equiv='refresh' content='2;url=view.php'>";
+    } else {
+        echo "<p style='color:red;'>Gagal menghapus data: " . pg_last_error($conn) . "</p>";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Hapus Peminjaman</title>
+</head>
+<body>
+ <h2>Hapus Data Peminjaman</h2>
+ <form method="POST" action="">
+   <label>Masukkan ID Pinjam yang ingin dihapus:</label><br>
+   <input type="number" name="id_pinjam" required><br><br>
+   <input type="submit" value="Hapus">
+ </form>
+</body>
+</html>
+

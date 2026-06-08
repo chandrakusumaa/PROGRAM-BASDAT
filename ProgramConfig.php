@@ -1,6 +1,6 @@
 <?php
 // Konfigurasi koneksi PostgreSQL
-$conn = pg_connect("host=LocalHost port=8000 dbname=db_perpustakaan user=postgres password=w1lmaL06!?");
+$conn = pg_connect("host=LocalHost port=5432 dbname=db_perpustakaan user=postgres password=root");
 
 if (!$conn) {
     die("Koneksi gagal: " . pg_last_error($conn));
@@ -10,10 +10,10 @@ if (!$conn) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama_peminjam = htmlspecialchars($_POST["nama_peminjam"]);
     $id_buku = htmlspecialchars($_POST["id_buku"]);
-    $tanggal_peminjam = $_POST["tanggal_peminjam"];
+    $tanggal_pinjam = $_POST["tanggal_pinjam"];
 
-    $sql = "INSERT INTO tbl_peminjam (nama_peminjam, id_buku, tanggal_peminjam)
-            VALUES ('$nama_peminjam', '$id_buku', '$tanggal_peminjam')";
+    $sql = "INSERT INTO tbl_peminjaman (nama_peminjam, id_buku, tanggal_pinjam)
+            VALUES ('$nama_peminjam', '$id_buku', '$tanggal_pinjam')";
 
     $result = pg_query($conn, $sql);
 
@@ -38,94 +38,123 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
    <label>Id Buku:</label><br>
    <input type="number" name="id_buku" required><br><br>
    <label>Tanggal Pinjam:</label><br>
-   <input type="date" name="tanggal_peminjam" required><br><br>
+   <input type="date" name="tanggal_pinjam" required><br><br>
    <input type="submit" value="Simpan">
  </form>
 </body>
-</html>
-
 
 <?php
-// Konfigurasi koneksi database
-$conn = pg_connect(
-    "host=localhost
-    port=8000
-    dbname=db_perpustakaan
-    user=postgres
-    password=w1lmaL06!?"
-);
 
-// Cek koneksi
-if (!$conn) {
-    die("Koneksi PostgreSQL gagal");
-}
-// Ambil data dari tabel
-$sql = "SELECT * FROM tbl_buku ORDER BY id_buku DESC";
-$result = pg_query($conn, $sql);
+// Data Buku
+$sql_buku = "SELECT * FROM tbl_buku ORDER BY id_buku DESC";
+$result_buku = pg_query($conn, $sql_buku);
+
+// Data Peminjaman
+$sql_pinjam = "
+SELECT p.id_pinjam,
+       p.nama_peminjam,
+       b.judul,
+       p.tanggal_pinjam
+FROM tbl_peminjaman p
+JOIN tbl_buku b ON p.id_buku = b.id_buku
+ORDER BY p.id_pinjam DESC";
+$result_pinjam = pg_query($conn, $sql_pinjam);
 ?>
 
-
-<!DOCTYPE html>
-<html>
 <head>
-    <title>Data Buku Perpustakaan</title>
+    <title>Perpustakaan</title>
     <style>
         table {
             border-collapse: collapse;
             width: 100%;
+            margin-bottom: 20px;
         }
+
         table, td, th {
-            border: 1px solid #000;
+            border: 1px solid black;
             padding: 8px;
         }
+
         th {
             background-color: #eee;
         }
     </style>
 </head>
 <body>
+
     <h2>Daftar Buku Perpustakaan</h2>
-    <a href="add.php">+ Tambah Buku Baru</a>
-    <br><br>
 
     <table>
-    <tr>
-        <th>No</th>
-        <th>id_buku</th>
-        <th>judul</th>
-        <th>Penulis</th>
-        <th>Tahun Terbit</th>
-        <th>Aksi</th>
-    </tr>
- <?php
-if (pg_num_rows($result) > 0) {
+        <tr>
+            <th>No</th>
+            <th>ID Buku</th>
+            <th>Judul</th>
+            <th>Penulis</th>
+            <th>Tahun Terbit</th>
+            <th>Aksi</th>
+        </tr>
 
-    $no = 1;
+        <?php
+        if (pg_num_rows($result_buku) > 0) {
 
-    while ($row = pg_fetch_assoc($result)) {
+            $no = 1;
 
-        echo "<tr>
-            <td>".$no++."</td>
-            <td>".$row['id_buku']."</td>
-            <td>".$row['judul']."</td>
-            <td>".$row['penulis']."</td>
-            <td>".$row['tahun_terbit']."</td>
-            <td>
-                <a href='edit.php?id=".$row['id_buku']."'>Edit</a> |
-                <a href='delete.php?id=".$row['id_buku']."'
-                onclick=\"return confirm('Yakin ingin menghapus?')\">Hapus</a>
-            </td>
-        </tr>";
-    }
+            while ($row = pg_fetch_assoc($result_buku)) {
 
-} else {
+                echo "<tr>
+                    <td>".$no++."</td>
+                    <td>".$row['id_buku']."</td>
+                    <td>".$row['judul']."</td>
+                    <td>".$row['penulis']."</td>
+                    <td>".$row['tahun_terbit']."</td>
+                    <td>
+                        <a href='edit.php?id=".$row['id_buku']."'>Edit</a> |
+                        <a href='delete.php?id=".$row['id_buku']."'
+                        onclick=\"return confirm('Yakin ingin menghapus?')\">Hapus</a>
+                    </td>
+                </tr>";
+            }
 
-    echo "<tr>
-            <td colspan='6'>Belum ada data buku.</td>
-          </tr>";
-}
-?>
+        } else {
+
+            echo "<tr>
+                    <td colspan='6'>Belum ada data buku.</td>
+                  </tr>";
+        }
+        ?>
     </table>
+
+    <h2>Data Peminjaman Buku</h2>
+
+    <table>
+        <tr>
+            <th>ID Pinjam</th>
+            <th>Nama Peminjam</th>
+            <th>Judul Buku</th>
+            <th>Tanggal Pinjam</th>
+        </tr>
+
+        <?php
+        if (pg_num_rows($result_pinjam) > 0) {
+
+            while ($row = pg_fetch_assoc($result_pinjam)) {
+
+                echo "<tr>
+                    <td>".$row['id_pinjam']."</td>
+                    <td>".$row['nama_peminjam']."</td>
+                    <td>".$row['judul']."</td>
+                    <td>".$row['tanggal_pinjam']."</td>
+                </tr>";
+            }
+
+        } else {
+
+            echo "<tr>
+                    <td colspan='4'>Belum ada data peminjaman.</td>
+                  </tr>";
+        }
+        ?>
+    </table>
+
 </body>
 </html>
-

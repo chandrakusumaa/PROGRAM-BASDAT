@@ -1,0 +1,15 @@
+CREATE DATABASE db_perpustakaan;
+
+CREATE TABLE tbl_buku (
+    id_buku SERIAL PRIMARY KEY,
+    judul VARCHAR(100) NOT NULL,
+    penulis VARCHAR(100) NOT NULL,
+    tahun_terbit INT NOT NULL
+);
+
+CREATE TABLE tbl_peminjaman (
+    id_pinjam SERIAL PRIMARY KEY,
+    nama_peminjam VARCHAR(100) NOT NULL,
+    id_buku INT REFERENCES tbl_buku(id_buku),
+    tanggal_pinjam DATE NOT NULL
+);

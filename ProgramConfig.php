@@ -1,6 +1,6 @@
 <?php
 // Konfigurasi koneksi PostgreSQL
-$conn = pg_connect("host=LocalHost port=5432 dbname=perpustakaan user=postgres password=root");
+$conn = pg_connect("host=LocalHost port=8000 dbname=db_perpustakaan user=postgres password=w1lmaL06!?");
 
 if (!$conn) {
     die("Koneksi gagal: " . pg_last_error($conn));
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Konfigurasi koneksi database
 $conn = pg_connect(
     "host=localhost
-    port=5432
+    port=8000
     dbname=db_perpustakaan
     user=postgres
     password=w1lmaL06!?"
@@ -128,3 +128,4 @@ if (pg_num_rows($result) > 0) {
     </table>
 </body>
 </html>
+
